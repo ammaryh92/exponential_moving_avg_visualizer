@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import streamlit as st
+import plotly.graph_objects as go
 
 df = pd.read_csv('houston_temp_2019.csv')
 df.set_index('Day', inplace=True)
@@ -31,10 +31,13 @@ with st.form('EMA'):
 
 
 em_avg = ewma(df.index, df['AvgTemperature'], beta=beta, bias_correction=bias)
-fig, ax = plt.subplots()
-plt.figure(figsize = (8,6))
-ax.scatter(x=df.index, y=df['AvgTemperature'])
-ax.plot(df.index, em_avg[1:], 'r-')
-st.pyplot(fig)
 
-
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=df.index, y=df['AvgTemperature'], mode='markers', name='Daily Temperature'))
+fig.add_trace(go.Scatter(x=df.index, y=em_avg[1:], mode='lines', name='Exponential Moving Average'))
+fig.update_layout(xaxis_title='Day', yaxis_title='Temperature', legend_title='Legend', width=1000, height=500,
+                    font=dict(
+                                family="Courier New, monospace",
+                                size=16,
+                                color="White"))
+st.plotly_chart(fig)
